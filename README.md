@@ -1,38 +1,54 @@
-# FPGA-Based Multi-Waveform Generator 🌊
+# Máy Phát Dạng Sóng Đa Năng Trên FPGA 🌊
 
-> **EE3041 DSP on FPGA - Lab 1 (HCMUT)**  
-> A versatile digital signal processing (DSP) system implemented on an FPGA to generate standard waveforms with real-time parameter tuning and controllable hardware noise injection.
-
-## 1. Project Overview 🚀
-This project serves as the foundational transmitter module for a complete communication and filtering system. It generates high-precision digital signals and converts them to analog outputs using onboard hardware.
-
-* **Supported Waveforms:** Sine, Square (50% duty cycle), Triangle, Sawtooth, and ECG (Electrocardiogram).
-* **Target Hardware:** Terasic DE10-Standard (Intel Cyclone V SX SoC FPGA).
-* **Audio DAC Configuration:** Wolfson WM8731 CODEC.
-* **Core Specifications:** System Clock: `3.072 MHz` | Audio Sampling Rate ($F_s$): `48 kHz` | Resolution: `24-bit`.
-
-## 2. RTL Architecture 🧩
-The design is modularly partitioned into four main functional blocks:
-
-* **DDS Core (Phase Accumulator & LUT):** The central processing unit generating the 5 distinct waveforms based on Direct Digital Synthesis principles.
-* **LFSR Noise Generator:** Generates 24-bit pseudo-random noise. It uses bit-shifting arithmetic for amplitude control (gain) to ensure resource efficiency.
-* **I2C Master Controller:** A robust Finite State Machine (FSM) operating at 300 kHz SCL to initialize and configure the DAC chip.
-* **I2S Transmitter Module:** Serializes, packs, and synchronizes the 24-bit parallel waveform data into Left/Right stereo audio channels.
-
-## 3. Critical Debugging & Problem Solving 🛠️
-*A highlight of the engineering process involved resolving the discrepancy between theoretical simulations and physical hardware behavior.*
-
-* **The Issue:** RTL simulation demonstrated perfect waveforms, but physical oscilloscope measurements exhibited distortion, incorrect duty cycles, and unprovoked noise.
-* **Root Cause Analysis & Fixes:**
-  1. **Data Format Mismatch (Signed vs. Unsigned):** The WM8731 DAC expects *signed* data, but our LUTs were outputting *unsigned* data. This caused severe clipping at extreme amplitudes. **Fix:** Converted LUT data representation.
-  2. **I2S Protocol Timing Skew:** The I2S transmitter was sending data immediately instead of waiting for the standard `1-BCLK` cycle delay required by the protocol. This corrupted the right-channel framing. **Fix:** Re-aligned the state machine to respect the 1-clock delay constraint.
-
-## 4. Synthesis Results & Efficiency 📊
-The design achieves high resource efficiency on **Intel Quartus Prime**, leaving ample logic elements for future complex DSP filtering blocks:
-
-* **Logic Elements (ALMs):** `< 1%` (Highly optimized control logic).
-* **DSP Blocks:** `0%` (Automatically optimized by using shift-based arithmetic instead of resource-heavy multipliers).
-* **Block Memory:** `9%` (Memory resources intentionally prioritized for complex waveform ROM arrays, such as the ECG signal).
+> **EE3041 Xử lý Tín hiệu Số trên FPGA - Lab 1 (Đại học Bách Khoa TP.HCM)**[cite: 1]
+> Một hệ thống xử lý tín hiệu số (DSP) đa năng được triển khai với hai kiến trúc phần cứng khác biệt, được tối ưu hóa cho hai bộ Kit phát triển **Terasic DE10-Standard** và **DE2**.[cite: 1]
 
 ---
-*Designed and debugged with ❤️ for the Digital Signal Processing on FPGA course.*
+
+## 1. Kiến trúc Dự án & Các Phiên bản 🚀
+Hệ thống tạo dạng sóng được phát triển thành **hai phiên bản phần cứng** nhằm thể hiện tư duy đánh đổi (trade-off) giữa việc sử dụng bộ nhớ và logic thiết kế:
+
+### 🔹 Phiên bản 1: Kiến trúc dựa trên Bảng tra cứu LUT (Phần cứng: Kit DE10-Standard)[cite: 1]
+* **Phương pháp:** Tổng hợp Tín hiệu số Trực tiếp (DDS) sử dụng **Bảng tra cứu (Look-Up Table - LUT)**.[cite: 1]
+* **Triển khai:** Toàn bộ 5 dạng sóng (Sin, Vuông, Tam giác, Răng cưa và tín hiệu điện tâm đồ sinh học ECG) được tính toán trước và lưu trữ trong **Block RAM** của FPGA.[cite: 1]
+* **Ưu điểm:** Tạo ra các dạng sóng mượt mà, độ phân giải cao với khả năng chia tỷ lệ pha và tần số cực kỳ chính xác, tận dụng tối đa dung lượng bộ nhớ lớn của chip Cyclone V SoC.[cite: 1]
+
+### 🔹 Phiên bản 2: Kiến trúc dựa trên FSM (Phần cứng: Kit DE2)
+* **Phương pháp:** Tạo tín hiệu bằng logic phần cứng thông qua **Máy trạng thái hữu hạn (FSM)** và các bộ đếm kỹ thuật số (Counters).
+* **Triển khai:** Các dạng sóng toán học (Vuông, Tam giác, Răng cưa) được tính toán động theo thời gian thực bằng các bộ đếm liên tục và máy trạng thái thay vì dùng mảng bộ nhớ.
+* **Ưu điểm:** **Tiết kiệm triệt để tài nguyên Block RAM**, tối ưu hóa cực tốt cho các dòng chip cũ hoặc hạn chế về tài nguyên như Cyclone IV/II trên board DE2.
+
+---
+
+## 2. Từ khóa Kỹ thuật & Năng lực 🎯
+* **Ngôn ngữ Mô tả Phần cứng:** Verilog / SystemVerilog.[cite: 1]
+* **Kiến trúc DSP:** Direct Digital Synthesis (DDS), Nén dữ liệu LUT, Bộ tạo tín hiệu điều khiển bằng FSM.[cite: 1]
+* **Tối ưu hóa Tài nguyên:** Bài toán đánh đổi Memory vs. Logic, Điều chỉnh biên độ bằng phép dịch bit (Bit-Shift Gain Control - thay thế các bộ nhân cồng kềnh bằng phép dịch logic).[cite: 1]
+* **Giao thức & Chuẩn giao tiếp:** I2C Master Interface (Cấu hình FSM), Giao thức âm thanh I2S (Truyền dữ liệu nối tiếp).[cite: 1]
+* **Kiểm thử & Xác minh:** Mô phỏng RTL bằng ModelSim / QuestaSim, Kiểm thử phần cứng (Hardware-in-the-Loop) qua Dao động ký kỹ thuật số (Oscilloscope).[cite: 1]
+
+---
+
+## 3. Thông số Phần cứng Hệ thống 📊
+* **Xung nhịp Hệ thống (System Clock) / MCLK:** 3.072 MHz / 12.288 MHz ($256 \times F_s$).[cite: 1]
+* **Cấu hình Audio DAC:** Sử dụng chip Wolfson WM8731 CODEC tích hợp trên board.[cite: 1]
+* **Tần số lấy mẫu & Độ phân giải:** Hoạt động ở $F_s = 48\text{ kHz}$ với độ phân giải 24-bit.[cite: 1]
+* **Module Tiêm Nhiễu:** Bộ thanh ghi dịch phản hồi tuyến tính (LFSR) 24-bit kết hợp bộ dồn kênh (multiplexer) để giảm chấn ($/1$ giảm dần đến $/128$).[cite: 1]
+
+---
+
+## 4. Quá trình Gỡ lỗi Kỹ thuật Chuyên sâu 🛠️
+*Một thành tựu kỹ thuật quan trọng của dự án này là quá trình điều tra và giải quyết triệt để sự sai lệch giữa kết quả mô phỏng RTL lý tưởng và tín hiệu thực tế đo được trên Oscilloscope:*[cite: 1]
+
+1. **Lỗi Định dạng Dữ liệu (Signed vs. Unsigned):** Chip DAC WM8731 yêu cầu các mẫu âm thanh có dấu (signed - bù 2), nhưng ban đầu các mảng LUT/FSM lại xuất ra giá trị độ lớn không dấu (unsigned).[cite: 1] Điều này dẫn đến hiện tượng xén ngọn tín hiệu (clipping) nghiêm trọng.[cite: 1]
+   * **Khắc phục:** Tổng hợp lại dữ liệu tra cứu và giới hạn logic để hệ thống hỗ trợ nguyên bản các phép toán có dấu.[cite: 1]
+2. **Lệch Đồng bộ Giao thức I2S (Timing Skew):** Đường truyền dữ liệu đã bỏ qua độ trễ chuẩn `1-BCLK` chu kỳ sau khi tín hiệu `DACLRC` chuyển trạng thái, làm hỏng khung dữ liệu của kênh âm thanh Stereo bên phải.[cite: 1]
+   * **Khắc phục:** Căn chỉnh lại logic điều khiển tuần tự để tuân thủ nghiêm ngặt các ràng buộc chuẩn của giao thức I2S.[cite: 1]
+
+---
+
+## 5. Tóm tắt Tổng hợp Tài nguyên (Cấu hình DE10-Standard) 📉
+* **Sử dụng Logic (ALMs):** 184 / 41,910 (< 1%)[cite: 1]
+* **Tổng số Thanh ghi (Registers):** 174[cite: 1]
+* **Bộ nhớ Block RAM:** 491,520 / 5,662,720 (9%) (Phần lớn được cấp phát cho mảng ROM tín hiệu ECG có mật độ cao trong Phiên bản 1).[cite: 1]
+* **Khối DSP (DSP Blocks):** 0% (Được tối ưu hóa hoàn toàn bằng logic dịch bit).[cite: 1]
