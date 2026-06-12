@@ -8,7 +8,7 @@
 ## 1. Kiến trúc & Phiên bản 🚀
 Hệ thống được tạo trên **hai phiên bản phần cứng** đánh đổi giữa việc sử dụng tài nguyên và logic thiết kế:
  
-### 🔹 Phiên bản 1: Kiến trúc Bảng LUT (Kit DE10-Standard)[cite: 1]
+### 🔹 Phiên bản 1: Kiến trúc Bảng LUT (Kit DE10-Standard)
 * **Phương pháp:** Sử dụng giải thuật DDS và sử dụng **Look-Up Table - LUT**.
 * **Triển khai:** Sin, Vuông, Tam giác, Răng cưa và ECG được lưu trữ trong **Block RAM** của FPGA.
 * **Ưu điểm:** Tạo dạng sóng mượt, độ phân giải cao và khả năng chia tỷ lệ pha và tần số chính xác, tận dụng dung lượng bộ nhớ lớn của chip Cyclone V SoC.
