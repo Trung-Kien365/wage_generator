@@ -1,4 +1,4 @@
-# Máy Phát Dạng Sóng Đa Năng Trên FPGA 🌊
+# Máy Phát Dạng Sóng Trên FPGA 🌊
 
 > **EE3041 Xử lý Tín hiệu Số trên FPGA - Lab 1 (Đại học Bách Khoa TP.HCM)**[cite: 1]
 > Một hệ thống xử lý tín hiệu số (DSP) đa năng được triển khai với hai kiến trúc phần cứng khác biệt, được tối ưu hóa cho hai bộ Kit phát triển **Terasic DE10-Standard** và **DE2**.[cite: 1]
@@ -10,13 +10,13 @@ Hệ thống tạo dạng sóng được phát triển thành **hai phiên bản
 
 ### 🔹 Phiên bản 1: Kiến trúc dựa trên Bảng tra cứu LUT (Phần cứng: Kit DE10-Standard)[cite: 1]
 * **Phương pháp:** Tổng hợp Tín hiệu số Trực tiếp (DDS) sử dụng **Bảng tra cứu (Look-Up Table - LUT)**.[cite: 1]
-* **Triển khai:** Toàn bộ 5 dạng sóng (Sin, Vuông, Tam giác, Răng cưa và tín hiệu điện tâm đồ sinh học ECG) được tính toán trước và lưu trữ trong **Block RAM** của FPGA.[cite: 1]
-* **Ưu điểm:** Tạo ra các dạng sóng mượt mà, độ phân giải cao với khả năng chia tỷ lệ pha và tần số cực kỳ chính xác, tận dụng tối đa dung lượng bộ nhớ lớn của chip Cyclone V SoC.[cite: 1]
+* **Triển khai:** Toàn bộ 5 dạng sóng (Sin, Vuông, Tam giác, Răng cưa và ECG) được lưu trữ trong **Block RAM** của FPGA.[cite: 1]
+* **Ưu điểm:** Tạo dạng sóng mượt, độ phân giải cao và khả năng chia tỷ lệ pha và tần số chính xác, tận dụng dung lượng bộ nhớ lớn của chip Cyclone V SoC.[cite: 1]
 
 ### 🔹 Phiên bản 2: Kiến trúc dựa trên FSM (Phần cứng: Kit DE2)
-* **Phương pháp:** Tạo tín hiệu bằng logic phần cứng thông qua **Máy trạng thái hữu hạn (FSM)** và các bộ đếm kỹ thuật số (Counters).
-* **Triển khai:** Các dạng sóng toán học (Vuông, Tam giác, Răng cưa) được tính toán động theo thời gian thực bằng các bộ đếm liên tục và máy trạng thái thay vì dùng mảng bộ nhớ.
-* **Ưu điểm:** **Tiết kiệm triệt để tài nguyên Block RAM**, tối ưu hóa cực tốt cho các dòng chip cũ hoặc hạn chế về tài nguyên như Cyclone IV/II trên board DE2.
+* **Phương pháp:** Tạo tín hiệu bằng thông qua **Máy trạng thái hữu hạn (FSM)** và các bộ đếm (Counters).
+* **Triển khai:** Các dạng sóng (Vuông, Tam giác, Răng cưa) được tính toán động theo thời gian thực bằng các bộ đếm liên tục và máy trạng thái.
+* **Ưu điểm:** **Tiết kiệm triệt để tài nguyên Block RAM**, tối ưu hóa cho các dòng chip cũ hoặc hạn chế về tài Cyclone II trên board DE2.
 
 ---
 
